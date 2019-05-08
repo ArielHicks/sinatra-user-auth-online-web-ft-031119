@@ -1,58 +1,20 @@
-require_relative '../../config/environment'
+class RegistrationsController < ApplicationController
 
-class ApplicationController < Sinatra::Base
+  get '/registrations/signup' do
 
-  configure do
-    set :public_folder, 'public'
-    set :views, 'app/views'
+    erb :'/registrations/signup'
   end
 
-  get '/' do
-    redirect to "/articles"
-  end
+  post '/registrations' do
+    # use the data in params to create a new user and log them in by
+    # setting the session[:id] equal to the user's id here
+    @user = User.new(name: params["name"], email: params["email"], password: params["password"])
+    @user.save
+    session[:id] = @user.id
 
-  # index
-  get "/articles" do
-    @articles = Article.all
-    erb :index
+    # this redirect takes us to the route: get '/users/home' that is in the Users Controller
+    #   go and look at that route in the Users Controller.
+    redirect '/users/home'
   end
-
-  # new
-  get "/articles/new" do
-    @article = Article.new
-    erb :new
-  end
-
-  # create
-  post "/articles" do
-    @article = Article.create(params)
-    redirect to "/articles/#{ @article.id }"
-  end
-
-  # show
-  get "/articles/:id" do
-    @article = Article.find(params[:id])
-    erb :show
-  end
-
-  # edit
-  get "/articles/:id/edit" do
-    @article = Article.find(params[:id])
-    erb :edit
-  end
-
-  # update
-  patch "/articles/:id" do
-    @article = Article.find(params[:id])
-    @article.update(params[:article])
-    redirect to "/articles/#{ @article.id }"
-  end
-
-  #destroy
-  delete "/articles/:id" do
-    Article.destroy(params[:id])
-    redirect to "/articles"
-  end
-
 
 end
